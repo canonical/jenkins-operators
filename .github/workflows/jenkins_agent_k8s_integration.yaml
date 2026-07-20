@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   integration-tests:
-    name: integration-tests
+    name: integration-tests-jenkins-agent-k8s
     uses: canonical/operator-workflows/.github/workflows/integration_test.yaml@main
     secrets: inherit
     permissions:
@@ -27,12 +27,14 @@ jobs:
       packages: write
       pull-requests: write
     with:
+      identifier: jenkins-agent-k8s
       build-context: charms/jenkins-agent-k8s
       charm-directory: .
+      test-tox-env: jenkins-agent-k8s-integration
       pre-run-script: |
         -c "sudo microk8s config > ${GITHUB_WORKSPACE}/kube-config
-        chmod +x tests/integration/pre_run_script.sh
-        ./tests/integration/pre_run_script.sh"
+        chmod +x charms/jenkins-agent-k8s/tests/integration/pre_run_script.sh
+        ./charms/jenkins-agent-k8s/tests/integration/pre_run_script.sh"
       extra-arguments: |
         --kube-config=${GITHUB_WORKSPACE}/kube-config
       modules: '["test_agent_k8s.py"]'
@@ -42,3 +44,14 @@ jobs:
       self-hosted-runner-label: "xlarge"
       microk8s-addons: "dns ingress rbac storage registry"
       with-uv: true
+
+  required-status-checks:
+    name: Required Integration Test Status Checks - jenkins-agent-k8s
+    runs-on: ubuntu-latest
+    needs:
+      - integration-tests
+    if: always() && !cancelled()
+    timeout-minutes: 5
+    steps:
+      - run: |
+          [ '${{ needs.integration-tests.result }}' = 'success' ] || (echo integration-tests failed && false)
