@@ -2,13 +2,15 @@
 # See LICENSE file for licensing details.
 
 [project]
-name = "platform-engineering-charm-template"
+name = "jenkins-operators"
 version = "0.0.0"
-description = "A very short one-line summary of the charm."
+description = "Jenkins charms monorepo."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
@@ -18,17 +20,27 @@ dependencies = [
 ]
 
 [dependency-groups]
-fmt = [
-  "ruff",
-]
+fmt = ["ruff"]
 lint = [
   "codespell",
-  "jubilant==1.11.0",
+  "docker",
+  "httpx==0.28.1",
+  "jenkinsapi>=0.3,<1",
+  "jinja2==3.1.6",
+  "jubilant",
+  "juju",
+  "lightkube==0.21.0",
   "mypy",
   "pep8-naming",
+  "pyotp==2.10.0",
   "pytest",
-  "requests",
+  "pytest-asyncio",
+  "pytest-operator",
+  "pytest-playwright==0.7.2",
+  "python-keycloak==7.1.1",
   "ruff",
+  "tenacity==9.1.4",
+  "toml",
   "types-pyyaml",
   "types-requests",
 ]
@@ -47,32 +59,32 @@ static = [
 integration = [
   "allure-pytest>=2.8.18",
   "allure-pytest-collection-report @ git+https://github.com/canonical/data-platform-workflows@v24.0.0#subdirectory=python/pytest_plugins/allure_pytest_collection_report",
-  "jubilant==1.11.0",
-  "opcli @ git+https://github.com/canonical/charm-ci.git@v0.0.1-alpha.5",
+  "docker",
+  "httpx==0.28.1",
+  "jenkinsapi>=0.3,<1",
+  "jinja2==3.1.6",
+  "jubilant",
+  "juju>=3,<4",
+  "lightkube==0.21.0",
+  "macaroonbakery",
+  "pyotp==2.10.0",
   "pytest",
+  "pytest-asyncio",
+  "pytest-operator",
+  "pytest-playwright==0.7.2",
+  "pytest-rerunfailures==15.1",
+  "python-keycloak==7.1.1",
+  "requests-toolbelt>=1.0.0",
+  "tenacity==9.1.4",
 ]
 
 [tool.uv]
 package = false
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py310"
 line-length = 99
 
-# enable ruff linters:
-#   S flake8-bandit
-#   B flake8-bugbear
-#   A flake8-builtins
-# CPY flake8-copyright
-# SIM flake8-simplify
-#  TC flake8-type-checking
-#   I isort
-#   N pep8-naming
-#   D pydocstyle
-#   F Pyflakes
-#  UP pyupgrade
-# RUF Ruff-specific rules
-# E/W pycodestyle
 lint.select = [ "A", "B", "C", "CPY", "D", "E", "F", "I", "N", "RUF", "S", "SIM", "TC", "UP", "W" ]
 lint.ignore = [
   "B904",
@@ -112,7 +124,6 @@ skip = "build,lib,venv,icon.svg,.tox,.git,.mypy_cache,.ruff_cache,.coverage,html
 [tool.pytest.ini_options]
 minversion = "6.0"
 log_cli_level = "INFO"
-pythonpath = [ "lib", "src" ]
 
 [tool.coverage.run]
 branch = true
@@ -121,18 +132,17 @@ branch = true
 show_missing = true
 
 [tool.mypy]
+ignore_missing_imports = true
 check_untyped_defs = true
 disallow_untyped_defs = true
-explicit_package_bases = true
-ignore_missing_imports = true
-namespace_packages = true
+plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-disallow_untyped_defs = false
 module = "tests.*"
+disallow_untyped_defs = false
 
 [tool.bandit]
-exclude_dirs = [ "/venv/" ]
+exclude_dirs = ["/venv/"]
 
 [tool.bandit.assert_used]
-skips = [ "*/*test.py", "*/test_*.py", "*tests/*.py" ]
+skips = ["*/*test.py", "*/test_*.py", "*tests/*.py"]

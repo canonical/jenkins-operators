@@ -1,0 +1,33 @@
+name: jenkins-agent lint and unit tests
+
+on:
+  pull_request:
+    paths:
+      - 'charms/jenkins-agent/**'
+      - '.github/workflows/jenkins_agent_*.yaml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'charms/jenkins-agent/**'
+      - '.github/workflows/jenkins_agent_*.yaml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  unit-tests:
+    name: unit-tests
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: canonical/operator-workflows/.github/workflows/test.yaml@main
+    secrets: inherit
+    with:
+      working-directory: charms/jenkins-agent
+      with-uv: true

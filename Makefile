@@ -1,41 +1,27 @@
 # Copyright 2025 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-# Top-level Makefile
-# Delegates targets to Makefile.docs
+.PHONY: lint unit test fmt format static integration clean
 
-# ==============================================================================
-# Macros
-# ==============================================================================
+lint:
+	tox -e jenkins-agent-lint,jenkins-agent-k8s-lint,jenkins-k8s-lint
 
-# Colors
-NO_COLOR=\033[0m
-CYAN_COLOR=\033[0;36m
-YELLOW_COLOR=\033[0;93m
-RED_COLOR=\033[0;91m
+unit:
+	tox -e jenkins-agent-unit,jenkins-agent-k8s-unit,jenkins-k8s-unit
 
-msg = @printf '$(CYAN_COLOR)$(1)$(NO_COLOR)\n'
-errmsg = @printf '$(RED_COLOR)Error: $(1)$(NO_COLOR)\n' && exit 1
+static:
+	tox -e jenkins-agent-static,jenkins-agent-k8s-static,jenkins-k8s-static
 
-# ==============================================================================
-# Core
-# ==============================================================================
+fmt:
+	ruff check --fix --select I charms/*/src charms/*/tests
+	ruff format charms/*/src charms/*/tests
 
-include Makefile.docs
+test: lint unit
 
-.PHONY: help 
-help: _list-targets ## Prints all available targets
+integration:
+	tox -e jenkins-agent-integration,jenkins-agent-k8s-integration,jenkins-k8s-integration
 
-.PHONY: _list-targets
-_list-targets: ## This collects and prints all targets, ignore internal commands
-	$(call msg,Available targets:)
-	@awk -F'[:#]' '                                               \
-		/^[a-zA-Z0-9._-]+:([^=]|$$)/ {                            \
-			target = $$1;                                         \
-			comment = "";                                         \
-			if (match($$0, /## .*/))                              \
-				comment = substr($$0, RSTART + 3);                \
-			if (target != ".PHONY" && target !~ /^_/ && !seen[target]++) \
-				printf "  make %-20s $(YELLOW_COLOR)# %s$(NO_COLOR)\n", target, comment;    \
-		}' $(MAKEFILE_LIST) | sort
-
+clean:
+	rm -rf .tox .mypy_cache .ruff_cache .pytest_cache
+	find . -type d -name __pycache__ -exec rm -rf {} +
+	find . -type f -name '*.pyc' -delete

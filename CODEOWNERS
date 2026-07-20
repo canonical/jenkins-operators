@@ -1,2 +1,2 @@
-# TODO: customize with a specific team
-*       @canonical/platform-engineering
+# These are the default owners for the whole repository. They review everything.
+* @canonical/platform-engineering-reviewers

@@ -1,0 +1,25 @@
+name: Repository lint
+
+on:
+  pull_request:
+    paths:
+      - 'pyproject.toml'
+      - 'tox.ini'
+      - 'Makefile'
+      - 'renovate.json'
+      - '.github/workflows/repo_lint.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  repo-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate pyproject.toml
+        run: python3 -c "import tomllib; tomllib.load(open('pyproject.toml', 'rb'))"
+      - name: Validate tox.ini
+        run: python3 -m configparser tox.ini
+      - name: Validate Renovate config
+        run: npx --yes renovate-config-validator
