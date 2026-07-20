@@ -51,5 +51,9 @@ header:
       - 'charms/*/lib/**'
       - 'charms/*/jenkins_rock/**'
       - 'charms/*/grafana_dashboards/**'
+      - 'charms/jenkins-agent/templates/Jenkinsfile'
+      - 'charms/jenkins-agent/templates/jenkins_agent.service'
+      - 'charms/jenkins-k8s/tests/integration/files/dex.yaml'
+      - 'charms/jenkins-k8s/tests/integration/files/identity-bundle-edge-patched.yaml'
       - 'docs/**'
     comment: on-failure

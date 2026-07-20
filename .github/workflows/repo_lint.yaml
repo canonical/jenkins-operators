@@ -22,4 +22,6 @@ jobs:
       - name: Validate tox.ini
         run: python3 -m configparser tox.ini
       - name: Validate Renovate config
+        env:
+          RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx --yes renovate config-validator
