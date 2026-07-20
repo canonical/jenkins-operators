@@ -41,6 +41,9 @@ jobs:
     name: integration-tests-jenkins-agent-amd64
     needs: changes
     if: github.event_name == 'push' || needs.changes.outputs.charm == 'true' || needs.changes.outputs.workflow == 'true'
+    permissions:
+      contents: read
+      packages: write
     uses: canonical/operator-workflows/.github/workflows/integration_test.yaml@main
     secrets: inherit
     with:
