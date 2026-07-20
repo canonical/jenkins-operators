@@ -21,8 +21,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  unit-tests:
-    name: unit-tests
+  unit-tests-jenkins-agent:
+    name: unit-tests-jenkins-agent
     permissions:
       contents: read
       pull-requests: write
