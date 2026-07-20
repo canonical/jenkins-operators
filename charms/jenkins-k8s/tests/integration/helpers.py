@@ -12,6 +12,7 @@ import typing
 from enum import Enum
 from urllib.parse import urlparse
 
+import jenkins
 import jenkinsapi.jenkins
 import kubernetes.client
 import requests
@@ -21,8 +22,6 @@ from juju.client._definitions import ApplicationStatus, FullStatus, UnitStatus
 from juju.model import Model
 from juju.unit import Unit
 from pytest_operator.plugin import OpsTest
-
-import jenkins
 
 from .types_ import UnitWebClient
 

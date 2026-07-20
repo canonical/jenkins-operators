@@ -9,12 +9,11 @@ import secrets
 import typing
 from unittest.mock import MagicMock, patch
 
+import jenkins
 import ops
 import pytest
-from ops.testing import Harness
-
-import jenkins
 from charm import JenkinsK8sOperatorCharm
+from ops.testing import Harness
 
 from .types_ import HarnessWithContainer
 

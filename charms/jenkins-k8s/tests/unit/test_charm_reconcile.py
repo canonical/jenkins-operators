@@ -10,12 +10,11 @@ import typing
 from secrets import token_hex
 from unittest.mock import MagicMock, patch
 
-import ops
-import pytest
-
 import charm
 import jenkins
+import ops
 import precondition
+import pytest
 import state
 from charm import JenkinsK8sOperatorCharm
 

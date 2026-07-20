@@ -10,10 +10,9 @@ from typing import Any, cast
 from unittest.mock import MagicMock
 
 import pytest
+from charm import JenkinsK8sOperatorCharm
 from charms.oauth2_proxy_k8s.v0.auth_proxy import AuthProxyConfig
 from ops.testing import Harness
-
-from charm import JenkinsK8sOperatorCharm
 
 
 @pytest.mark.parametrize(

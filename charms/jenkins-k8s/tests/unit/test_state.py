@@ -9,7 +9,6 @@ from unittest.mock import MagicMock
 
 import ops
 import pytest
-
 import state
 
 

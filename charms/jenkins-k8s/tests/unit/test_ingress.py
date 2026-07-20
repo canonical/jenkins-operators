@@ -6,12 +6,11 @@
 import json
 from unittest.mock import MagicMock
 
+import jenkins
 import pytest
+from charm import JenkinsK8sOperatorCharm
 from charms.traefik_k8s.v2.ingress import IngressPerAppRequirer
 from ops.testing import Harness
-
-import jenkins
-from charm import JenkinsK8sOperatorCharm
 
 
 def _patch_reconcile_dependencies(monkeypatch: pytest.MonkeyPatch):

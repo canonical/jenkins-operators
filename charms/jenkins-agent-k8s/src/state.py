@@ -8,11 +8,10 @@ import os
 import typing
 from dataclasses import dataclass
 
-import ops
-from pydantic import AnyHttpUrl, BaseModel, Field, ValidationError, tools
-
 import metadata
+import ops
 import server
+from pydantic import AnyHttpUrl, BaseModel, Field, ValidationError, tools
 
 # agent relation name
 AGENT_RELATION = "agent"

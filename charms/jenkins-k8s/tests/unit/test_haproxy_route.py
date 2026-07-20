@@ -5,11 +5,10 @@
 
 from unittest.mock import MagicMock
 
-import pytest
-from ops.testing import Harness
-
 import jenkins
+import pytest
 from charm import JenkinsK8sOperatorCharm
+from ops.testing import Harness
 from state import State
 
 

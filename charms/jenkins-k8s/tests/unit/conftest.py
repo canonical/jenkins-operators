@@ -10,18 +10,17 @@ from secrets import token_hex
 from typing import Any, Callable, Tuple, cast
 from unittest.mock import MagicMock
 
+import jenkins
 import jenkinsapi.jenkins
 import pytest
 import requests
+import state
 import yaml
+from charm import REQUIRED_PLUGINS, JenkinsK8sOperatorCharm
 from ops.charm import CharmBase
 from ops.model import Container
 from ops.pebble import ExecError
 from ops.testing import Harness
-
-import jenkins
-import state
-from charm import REQUIRED_PLUGINS, JenkinsK8sOperatorCharm
 
 from .helpers import combine_root_paths
 from .types_ import HarnessWithContainer

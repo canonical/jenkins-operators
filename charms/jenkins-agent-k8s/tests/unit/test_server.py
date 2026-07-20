@@ -14,7 +14,6 @@ import ops
 import ops.testing
 import pytest
 import requests
-
 import server
 
 

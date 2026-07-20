@@ -37,7 +37,11 @@ lint = [
   "pytest-asyncio",
   "pytest-operator",
   "pytest-playwright==0.7.2",
+  "python-dotenv",
   "python-keycloak==7.1.1",
+  "pydantic",
+  "pyyaml",
+  "requests",
   "ruff",
   "tenacity==9.1.4",
   "toml",
@@ -46,8 +50,14 @@ lint = [
 ]
 unit = [
   "coverage[toml]",
+  "jinja2==3.1.6",
   "ops[testing]",
+  "pydantic",
   "pytest",
+  "python-dotenv",
+  "pyyaml",
+  "requests",
+  "tenacity",
 ]
 coverage-report = [
   "coverage[toml]",
@@ -92,6 +102,7 @@ lint.ignore = [
   "D203",
   "D204",
   "D205",
+  "D212",
   "D213",
   "D215",
   "D400",
@@ -102,8 +113,11 @@ lint.ignore = [
   "D409",
   "D413",
   "E501",
+  "S101",
   "S105",
+  "S110",
   "S603",
+  "S607",
   "TC002",
   "TC006",
   "UP006",
@@ -111,7 +125,7 @@ lint.ignore = [
   "UP035",
   "UP045",
 ]
-lint.per-file-ignores."tests/*" = [ "B011", "D100", "D101", "D102", "D103", "D104", "D212", "D415", "D417", "S" ]
+lint.per-file-ignores."charms/*/tests/*" = [ "B011", "D100", "D101", "D102", "D103", "D104", "D212", "D415", "D417", "S" ]
 lint.flake8-copyright.author = "Canonical Ltd."
 lint.flake8-copyright.min-file-size = 1
 lint.flake8-copyright.notice-rgx = "Copyright\\s\\d{4}([-,]\\d{4})*\\s+"
@@ -138,8 +152,9 @@ disallow_untyped_defs = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = "tests.*"
+module = ["tests.*", "test_jenkins_readiness"]
 disallow_untyped_defs = false
+ignore_errors = true
 
 [tool.bandit]
 exclude_dirs = ["/venv/"]

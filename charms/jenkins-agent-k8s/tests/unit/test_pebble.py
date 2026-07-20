@@ -11,9 +11,8 @@ import typing
 import unittest.mock
 
 import ops
-import pytest
-
 import pebble
+import pytest
 import server
 import state
 

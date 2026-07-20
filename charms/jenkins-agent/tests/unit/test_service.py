@@ -15,11 +15,10 @@ from unittest.mock import MagicMock, PropertyMock
 
 import ops.testing
 import pytest
-from charms.operator_libs_linux.v0 import apt
-from charms.operator_libs_linux.v1 import systemd
-
 import service
 from charm_state import AGENT_RELATION
+from charms.operator_libs_linux.v0 import apt
+from charms.operator_libs_linux.v1 import systemd
 
 if TYPE_CHECKING:
     from charm import JenkinsAgentCharm

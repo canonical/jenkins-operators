@@ -4,9 +4,8 @@
 """Integration tests for jenkins-k8s-operator charm."""
 
 import jenkinsapi.jenkins
-from juju.application import Application
-
 import state
+from juju.application import Application
 
 from .helpers import assert_job_success
 

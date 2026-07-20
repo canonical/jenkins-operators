@@ -7,10 +7,9 @@ import logging
 
 import jenkinsapi.jenkins
 import requests
+import state
 from juju.application import Application
 from juju.model import Model
-
-import state
 
 from .helpers import assert_job_success
 

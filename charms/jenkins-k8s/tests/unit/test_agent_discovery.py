@@ -6,10 +6,9 @@
 import socket
 from unittest.mock import patch
 
-from ops import testing
-
 import charm
 from charm import JenkinsK8sOperatorCharm
+from ops import testing
 from state import AGENT_DISCOVERY_INGRESS_RELATION_NAME, JENKINS_SERVICE_NAME
 
 _MONKEYPATCHED_FQDN = "192.0.2.0"

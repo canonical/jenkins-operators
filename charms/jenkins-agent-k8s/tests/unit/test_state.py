@@ -13,7 +13,6 @@ import unittest.mock
 import ops
 import ops.testing
 import pytest
-
 import state
 
 

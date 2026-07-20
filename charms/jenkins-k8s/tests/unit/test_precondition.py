@@ -6,11 +6,11 @@
 # Need access to protected functions for testing
 # pylint:disable=protected-access
 
+import precondition
 import pytest
+from charm import JenkinsK8sOperatorCharm
 from ops import testing
 
-import precondition
-from charm import JenkinsK8sOperatorCharm
 from tests.unit.constants import JENKINS_CONTAINER_NAME, JENKINS_STORAGE_NAME
 
 
