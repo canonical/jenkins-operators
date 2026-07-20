@@ -1,10 +1,10 @@
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+
 name: jenkins-k8s lint and unit tests
 
 on:
   pull_request:
-    paths:
-      - 'charms/jenkins-k8s/**'
-      - '.github/workflows/jenkins_k8s_*.yaml'
   push:
     branches:
       - main
@@ -21,8 +21,26 @@ permissions:
   pull-requests: write
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      charm: ${{ steps.filter.outputs.charm }}
+      workflow: ${{ steps.filter.outputs.workflow }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            charm:
+              - 'charms/jenkins-k8s/**'
+            workflow:
+              - '.github/workflows/jenkins_k8s_*.yaml'
+
   unit-tests-jenkins-k8s:
     name: unit-tests-jenkins-k8s
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.charm == 'true' || needs.changes.outputs.workflow == 'true'
     permissions:
       contents: read
       pull-requests: write
@@ -31,3 +49,14 @@ jobs:
     with:
       working-directory: charms/jenkins-k8s
       with-uv: true
+
+  required-status-checks:
+    name: Required Test Status Checks - jenkins-k8s
+    runs-on: ubuntu-latest
+    needs:
+      - unit-tests-jenkins-k8s
+    if: always() && !cancelled()
+    timeout-minutes: 5
+    steps:
+      - run: |
+          [ '${{ needs.unit-tests-jenkins-k8s.result }}' = 'success' ] || [ '${{ needs.unit-tests-jenkins-k8s.result }}' = 'skipped' ] || (echo unit-tests failed && false)

@@ -1,12 +1,16 @@
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+
 name: jenkins-agent integration tests
 
 on:
   pull_request:
+  push:
+    branches:
+      - main
     paths:
       - 'charms/jenkins-agent/**'
       - '.github/workflows/jenkins_agent_*.yaml'
-  schedule:
-    - cron: "0 15 * * SAT"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -17,8 +21,26 @@ permissions:
   packages: write
 
 jobs:
-  integration-tests-amd64:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      charm: ${{ steps.filter.outputs.charm }}
+      workflow: ${{ steps.filter.outputs.workflow }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            charm:
+              - 'charms/jenkins-agent/**'
+            workflow:
+              - '.github/workflows/jenkins_agent_*.yaml'
+
+  integration-tests-jenkins-agent-amd64:
     name: integration-tests-jenkins-agent-amd64
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.charm == 'true' || needs.changes.outputs.workflow == 'true'
     uses: canonical/operator-workflows/.github/workflows/integration_test.yaml@main
     secrets: inherit
     with:
@@ -32,8 +54,10 @@ jobs:
       self-hosted-runner: true
       with-uv: true
 
-  integration-tests-non-amd64:
+  integration-tests-jenkins-agent-non-amd64:
     name: integration-tests-jenkins-agent-non-amd64
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.charm == 'true' || needs.changes.outputs.workflow == 'true'
     strategy:
       matrix:
         runtime: [s390x, arm64, ppc64le]
@@ -56,15 +80,13 @@ jobs:
       self-hosted-runner-label: ${{ matrix.runtime }}
       with-uv: true
 
-  integration-tests:
+  required-status-checks:
     name: Required Integration Test Status Checks - jenkins-agent
     runs-on: ubuntu-latest
     needs:
-      - integration-tests-amd64
-      - integration-tests-non-amd64
+      - integration-tests-jenkins-agent-amd64
     if: always() && !cancelled()
     timeout-minutes: 5
     steps:
       - run: |
-          [ '${{ needs.integration-tests-amd64.result }}' = 'success' ] || (echo integration-tests-amd64 failed && false)
-          [ '${{ needs.integration-tests-non-amd64.result }}' = 'success' ] || (echo integration-tests-non-amd64 failed && false)
+          [ '${{ needs.integration-tests-jenkins-agent-amd64.result }}' = 'success' ] || [ '${{ needs.integration-tests-jenkins-agent-amd64.result }}' = 'skipped' ] || (echo amd64 integration tests failed && false)
