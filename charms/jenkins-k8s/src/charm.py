@@ -15,12 +15,7 @@ import socket
 import typing
 from urllib.parse import urlparse
 
-import jenkins
 import ops
-import pebble
-import precondition
-import storage
-import timerange
 import yaml
 from charms.grafana_k8s.v0.grafana_dashboard import GrafanaDashboardProvider
 from charms.haproxy.v2.haproxy_route import HaproxyRouteRequirer
@@ -28,6 +23,12 @@ from charms.loki_k8s.v0.loki_push_api import LogProxyConsumer
 from charms.oauth2_proxy_k8s.v0.auth_proxy import AuthProxyConfig, AuthProxyRequirer
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
 from charms.traefik_k8s.v2.ingress import IngressPerAppRequirer
+
+import jenkins
+import pebble
+import precondition
+import storage
+import timerange
 from state import (
     AGENT_DISCOVERY_INGRESS_RELATION_NAME,
     AGENT_RELATION,

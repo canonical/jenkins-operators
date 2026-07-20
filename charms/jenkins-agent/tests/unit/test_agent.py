@@ -12,6 +12,7 @@ from unittest.mock import PropertyMock
 import ops
 import ops.testing
 import pytest
+
 import service
 from charm_state import AGENT_RELATION
 

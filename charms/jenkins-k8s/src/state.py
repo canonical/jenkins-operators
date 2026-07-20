@@ -12,6 +12,7 @@ import typing
 import ops
 import yaml
 from pydantic import BaseModel, Field, HttpUrl, ValidationError, field_validator
+
 from timerange import InvalidTimeRangeError, Range
 
 logger = logging.getLogger(__name__)

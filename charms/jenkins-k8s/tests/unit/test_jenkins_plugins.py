@@ -11,11 +11,12 @@ import typing
 from contextlib import ExitStack
 from unittest.mock import MagicMock, patch
 
-import jenkins
 import jenkinsapi
 import ops
 import pytest
 import requests
+
+import jenkins
 
 
 def _jenkins_instance(container: ops.Container) -> jenkins.Jenkins:

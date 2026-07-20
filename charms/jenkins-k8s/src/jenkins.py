@@ -25,11 +25,12 @@ import jenkinsapi.custom_exceptions
 import jenkinsapi.jenkins
 import ops
 import requests
-import state
 import tenacity
 import yaml
 from jenkinsapi.node import Node
 from pydantic import HttpUrl
+
+import state
 
 logger = logging.getLogger(__name__)
 

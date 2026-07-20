@@ -9,10 +9,11 @@ import os
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
-import charm_state
 import ops
 import ops.testing
 import pytest
+
+import charm_state
 
 if TYPE_CHECKING:
     from charm import JenkinsAgentCharm

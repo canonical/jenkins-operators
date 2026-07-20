@@ -16,7 +16,6 @@ import kubernetes.config
 import pytest
 import pytest_asyncio
 import requests
-import state
 from juju.action import Action
 from juju.application import Application
 from juju.controller import Controller
@@ -25,6 +24,8 @@ from juju.unit import Unit
 from keycloak import KeycloakAdmin, KeycloakOpenIDConnection
 from pytest import FixtureRequest
 from pytest_operator.plugin import OpsTest
+
+import state
 
 from .constants import ALLOWED_PLUGINS
 from .helpers import (

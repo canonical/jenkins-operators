@@ -10,8 +10,9 @@ import datetime
 import typing
 from unittest.mock import MagicMock
 
-import jenkins
 import pytest
+
+import jenkins
 import state
 import timerange
 from charm import REQUIRED_PLUGINS, JenkinsK8sOperatorCharm

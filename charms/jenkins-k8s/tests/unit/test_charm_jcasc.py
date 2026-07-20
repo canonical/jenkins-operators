@@ -10,11 +10,12 @@ import hashlib
 import typing
 from unittest.mock import MagicMock, patch
 
-import jenkins
 import ops
 import pytest
-import state
 import yaml
+
+import jenkins
+import state
 from charm import JenkinsK8sOperatorCharm, ReconcileBlockedError
 
 from .types_ import HarnessWithContainer

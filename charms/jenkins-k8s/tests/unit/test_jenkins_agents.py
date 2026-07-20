@@ -10,10 +10,11 @@ import json
 from secrets import token_hex
 from unittest.mock import MagicMock, patch
 
-import jenkins
 import jenkinsapi
 import ops
 import pytest
+
+import jenkins
 import state
 
 

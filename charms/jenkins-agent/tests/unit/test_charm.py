@@ -9,10 +9,11 @@ from types import SimpleNamespace
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, PropertyMock
 
-import charm_state
 import ops
 import ops.testing
 import pytest
+
+import charm_state
 import service
 
 if TYPE_CHECKING:

@@ -12,6 +12,7 @@ from unittest.mock import MagicMock, patch
 
 import ops
 import pytest
+
 from charm import JenkinsK8sOperatorCharm
 
 from .helpers import WAITING_STATUS_NAME

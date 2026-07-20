@@ -17,10 +17,11 @@ from unittest.mock import MagicMock
 
 import ops
 import pytest
+from ops.testing import Harness
+
 import server
 import state
 from charm import JenkinsAgentCharm
-from ops.testing import Harness
 
 from .constants import ACTIVE_STATUS_NAME, BLOCKED_STATUS_NAME
 

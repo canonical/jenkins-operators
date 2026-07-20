@@ -9,9 +9,10 @@ import logging
 import typing
 
 import ops
+from ops.main import main
+
 import pebble
 import server
-from ops.main import main
 from state import AGENT_RELATION, InvalidStateError, State
 
 logger = logging.getLogger()

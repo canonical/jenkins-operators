@@ -12,10 +12,11 @@ from contextlib import nullcontext
 from functools import partial
 from unittest.mock import MagicMock
 
-import jenkins
 import ops
 import pytest
 import requests
+
+import jenkins
 
 from .helpers import ConnectionExceptionPatch
 
