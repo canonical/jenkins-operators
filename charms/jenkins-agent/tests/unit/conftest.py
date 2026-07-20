@@ -7,11 +7,10 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
-from ops.testing import Harness
-
 import service
 from charm import JenkinsAgentCharm
 from charm_state import AGENT_RELATION
+from ops.testing import Harness
 
 
 @pytest.fixture(scope="module", name="agent_relation_data")

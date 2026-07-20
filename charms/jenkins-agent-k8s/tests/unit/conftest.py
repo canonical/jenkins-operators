@@ -9,11 +9,10 @@ import unittest.mock
 
 import ops
 import pytest
-from ops.testing import Harness
-
 import server
 import state
 from charm import JenkinsAgentCharm
+from ops.testing import Harness
 
 
 @pytest.fixture(scope="function", name="harness")

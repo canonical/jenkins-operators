@@ -17,9 +17,8 @@ import unittest.mock
 
 import ops
 import ops.testing
-import pytest
-
 import pebble
+import pytest
 import server
 import state
 from charm import JenkinsAgentCharm

@@ -12,10 +12,9 @@ import typing
 from pathlib import Path
 
 import jinja2
+from charm_state import Credentials, State
 from charms.operator_libs_linux.v0 import apt
 from charms.operator_libs_linux.v1 import systemd
-
-from charm_state import Credentials, State
 
 logger = logging.getLogger(__name__)
 AGENT_SERVICE_NAME = "jenkins-agent"

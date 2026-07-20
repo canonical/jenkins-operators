@@ -8,12 +8,11 @@ import secrets
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+import jenkins
 import ops
 import pytest
-from ops import testing
-
-import jenkins
 from charm import JenkinsK8sOperatorCharm
+from ops import testing
 from state import AgentMeta, State
 
 

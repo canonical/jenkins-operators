@@ -5,9 +5,8 @@
 
 import logging
 
-import ops
-
 import jenkins
+import ops
 
 logger = logging.getLogger(__name__)
 

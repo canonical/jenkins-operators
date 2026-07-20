@@ -14,12 +14,11 @@ from pathlib import Path
 from typing import Callable
 from unittest.mock import MagicMock
 
+import jenkins
 import jenkinsapi
 import ops
 import pytest
 import requests
-
-import jenkins
 
 from .helpers import combine_root_paths
 from .types_ import HarnessWithContainer

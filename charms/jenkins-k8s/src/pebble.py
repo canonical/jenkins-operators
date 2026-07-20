@@ -7,9 +7,8 @@ import logging
 import typing
 from pathlib import Path
 
-import ops
-
 import jenkins
+import ops
 from state import JENKINS_SERVICE_NAME, State
 
 if typing.TYPE_CHECKING:

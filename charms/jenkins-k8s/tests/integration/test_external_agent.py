@@ -7,10 +7,9 @@ from dataclasses import dataclass
 
 import pytest
 import pytest_asyncio
+import state
 from juju.application import Application
 from juju.model import Model
-
-import state
 
 
 @dataclass

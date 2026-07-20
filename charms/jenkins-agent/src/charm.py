@@ -9,7 +9,6 @@ import logging
 import typing
 
 import ops
-
 import service
 from charm_state import AGENT_RELATION, InvalidStateError, State
 

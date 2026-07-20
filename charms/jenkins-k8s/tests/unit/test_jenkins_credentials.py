@@ -11,13 +11,12 @@ from contextlib import contextmanager
 from secrets import token_hex
 from unittest.mock import MagicMock, patch
 
+import jenkins
 import jenkinsapi
 import jenkinsapi.utils.requester
 import ops
 import pytest
 import requests
-
-import jenkins
 
 from .types_ import HarnessWithContainer
 

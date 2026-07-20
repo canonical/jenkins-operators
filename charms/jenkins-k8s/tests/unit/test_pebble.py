@@ -7,11 +7,10 @@ from types import SimpleNamespace
 from typing import Any, cast
 from unittest.mock import MagicMock
 
-import ops
-import pytest
-
 import jenkins
+import ops
 import pebble
+import pytest
 
 
 @pytest.mark.parametrize(

@@ -3,9 +3,9 @@
 
 """Jenkins-k8s charm storage tests."""
 
+from charm import JenkinsK8sOperatorCharm
 from ops import testing
 
-from charm import JenkinsK8sOperatorCharm
 from tests.unit.constants import (
     JENKINS_CONTAINER_NAME,
     JENKINS_HOME_DIR,
