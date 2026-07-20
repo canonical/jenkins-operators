@@ -1,26 +1,216 @@
-venv/
-build/
-*.charm
-.tox/
-.coverage
-__pycache__/
-*.py[cod]
-.idea
-.vscode
-.mypy_cache
-*.egg-info/
-*/*.rock
-terraform/tests/.terraform
-
-# BEGIN VALE WORKFLOW IGNORE
-.vale/styles/*
-!.vale/styles/local
-!.vale/styles/config/
-
-.vale/styles/config/*
-!.vale/styles/config/vocabularies/
-
-.vale/styles/config/vocabularies/*
-!.vale/styles/config/vocabularies/local
-# END VALE WORKFLOW IGNORE
-
+1|venv/
+2|build/
+3|*.charm
+4|.tox/
+5|.coverage
+6|__pycache__/
+7|*.py[cod]
+8|.idea
+9|.vscode
+10|.mypy_cache
+11|*.egg-info/
+12|*/*.rock
+13|*/*.snap
+14|# charmcraft-related directories
+15|prime/
+16|parts/
+17|stage/
+18|
+19|# BEGIN VALE WORKFLOW IGNORE
+20|.vale/styles/*
+21|!.vale/styles/local
+22|!.vale/styles/config/
+23|
+24|.vale/styles/config/*
+25|!.vale/styles/config/vocabularies/
+26|
+27|.vale/styles/config/vocabularies/*
+28|!.vale/styles/config/vocabularies/local
+29|# END VALE WORKFLOW IGNORE
+30|.DS_Store
+31|
+32|# AI artifacts
+33|.hermes
+34|docs/plans/
+35|docs/superpowers/
+36|
+1|*~
+2|*.charm
+3|.tox
+4|.coverage
+5|coverage.xml
+6|__pycache__
+7|build
+8|lib/ops
+9|lib/ops-*.dist-info
+10|^unit/
+11|.vscode
+12|venv
+13|*.rock
+14|
+15|# BEGIN VALE WORKFLOW IGNORE
+16|.vale/styles/*
+17|!.vale/styles/local
+18|!.vale/styles/config/
+19|
+20|.vale/styles/config/*
+21|!.vale/styles/config/vocabularies/
+22|
+23|.vale/styles/config/vocabularies/*
+24|!.vale/styles/config/vocabularies/local
+25|# END VALE WORKFLOW IGNORE
+27|.DS_Store
+28|
+1|# Byte-compiled / optimized / DLL files
+2|__pycache__/
+3|*.py[cod]
+4|*$py.class
+5|
+6|# C extensions
+7|*.so
+8|
+9|# Distribution / packaging
+10|.Python
+11|build/
+12|develop-eggs/
+13|dist/
+14|downloads/
+15|eggs/
+16|.eggs/
+17|lib64/
+18|parts/
+19|sdist/
+20|var/
+21|wheels/
+22|pip-wheel-metadata/
+23|share/python-wheels/
+24|*.egg-info/
+25|.installed.cfg
+26|*.egg
+27|MANIFEST
+29|# PyInstaller
+30|#  Usually these files are written by a python script from a template
+31|#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+32|*.manifest
+33|*.spec
+34|
+35|# Installer logs
+36|pip-log.txt
+37|pip-delete-this-directory.txt
+38|
+39|# Unit test / coverage reports
+40|htmlcov/
+41|.tox/
+42|.nox/
+43|.coverage
+44|.coverage.*
+45|.cache
+46|nosetests.xml
+47|coverage.xml
+48|*.cover
+49|*.py,cover
+50|.hypothesis/
+51|.pytest_cache/
+52|
+53|# Translations
+54|*.mo
+55|*.pot
+56|
+57|# Django stuff:
+58|*.log
+59|local_settings.py
+60|db.sqlite3
+61|db.sqlite3-journal
+62|
+63|# Flask stuff:
+64|instance/
+65|.webassets-cache
+66|
+67|# Scrapy stuff:
+68|.scrapy
+69|
+70|# Sphinx documentation
+71|docs/_build/
+72|
+73|# PyBuilder
+74|target/
+75|
+76|# Jupyter Notebook
+77|.ipynb_checkpoints
+78|
+79|# IPython
+80|profile_default/
+81|ipython_config.py
+82|
+83|# pyenv
+84|.python-version
+85|
+86|# pipenv
+87|#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+88|#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+89|#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+90|#   install all needed dependencies.
+91|#Pipfile.lock
+92|
+93|# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+94|__pypackages__/
+95|
+96|# Celery stuff
+97|celerybeat-schedule
+98|celerybeat.pid
+99|
+100|# SageMath parsed files
+101|*.sage.py
+102|
+103|# Environments
+104|.env
+105|.venv
+106|env/
+107|venv/
+108|ENV/
+109|env.bak/
+110|venv.bak/
+111|
+112|# Spyder project settings
+113|.spyderproject
+114|.spyproject
+115|
+116|# Rope project settings
+117|.ropeproject
+118|
+119|# mkdocs documentation
+120|/site
+121|
+122|# mypy
+123|.mypy_cache/
+124|.dmypy.json
+125|dmypy.json
+126|
+127|# Pyre type checker
+128|.pyre/
+129|
+130|# rocks
+131|*/*.rock
+132|
+133|# charm artifact
+134|*.charm
+135|
+136|# BEGIN VALE WORKFLOW IGNORE
+137|.vale/styles/*
+138|!.vale/styles/local
+139|!.vale/styles/config/
+140|
+141|.vale/styles/config/*
+142|!.vale/styles/config/vocabularies/
+143|
+144|.vale/styles/config/vocabularies/*
+145|!.vale/styles/config/vocabularies/local
+146|# END VALE WORKFLOW IGNORE
+147|
+148|# OS artifacts
+149|.DS_Store
+150|
+151|# AI artifacts
+152|.worktrees
+153|docs/superpowers/
+154|

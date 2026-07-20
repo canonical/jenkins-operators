@@ -1,0 +1,33 @@
+name: jenkins-k8s lint and unit tests
+
+on:
+  pull_request:
+    paths:
+      - 'charms/jenkins-k8s/**'
+      - '.github/workflows/jenkins_k8s_*.yaml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'charms/jenkins-k8s/**'
+      - '.github/workflows/jenkins_k8s_*.yaml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  unit-tests:
+    name: unit-tests
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: canonical/operator-workflows/.github/workflows/test.yaml@main
+    secrets: inherit
+    with:
+      working-directory: charms/jenkins-k8s
+      with-uv: true

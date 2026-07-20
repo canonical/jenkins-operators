@@ -1,77 +1,56 @@
-<!--
-Avoid using this README file for information that is maintained or published elsewhere, e.g.:
+# Jenkins Operators
 
-* metadata.yaml > published on Charmhub
-* documentation > published on (or linked to from) Charmhub
-* detailed contribution guide > documentation or CONTRIBUTING.md
+Monorepo for the Jenkins charms maintained by Canonical Platform Engineering.
 
-Use links instead.
--->
-# Platform engineering charm template
-<!-- Use this space for badges -->
+This repository contains:
 
-Describe your charm in 1-2 sentences. Include the software that the charm deploys (if applicable), and the substrate (VM/K8s).
+- [`charms/jenkins-agent`](charms/jenkins-agent) — Jenkins machine agent charm
+- [`charms/jenkins-agent-k8s`](charms/jenkins-agent-k8s) — Jenkins Kubernetes agent charm
+- [`charms/jenkins-k8s`](charms/jenkins-k8s) — Jenkins server charm for Kubernetes
 
-Like any Juju charm, this charm supports one-line deployment, configuration, integration, scaling, and more. For Charmed {Name}, this includes:
-* list or summary of app-specific features
+## Repository structure
 
-For information about how to deploy, integrate, and manage this charm, see the Official [platform-engineering-charm-template Documentation](external link).
+```
+canonical/jenkins-operators/
+├── charms/
+│   ├── jenkins-agent/
+│   ├── jenkins-agent-k8s/
+│   └── jenkins-k8s/
+├── docs/
+├── pyproject.toml
+├── tox.ini
+└── Makefile
+```
 
-## Get started
-<!--If the charm already contains a relevant how-to guide or tutorial in its documentation,
-use this section to link the documentation. You don’t need to duplicate documentation here.
-If the tutorial is more complex than getting started, then provide brief descriptions of the
-steps needed for the simplest possible deployment. Make sure to include software and hardware
-prerequisites.
+Shared tooling — lint, unit tests, static analysis, CI — lives at the repository root.
+Each charm keeps its own `charmcraft.yaml`, source, tests, and vendored libraries under
+`charms/<name>/`.
 
-This section could be structured in the following way:
+## Getting started
 
-### Set up
-<Steps for setting up the environment (e.g. via Multipass)>
+Run all lint checks:
 
-### Deploy
-<Steps for deploying the charm>
+```bash
+make lint
+```
 
--->
+Run all unit tests:
 
-### Basic operations
-<!--Brief walkthrough of performing standard configurations or operations.
+```bash
+make unit
+```
 
-Use this section is to emphasize features or capabilities of the charm.
-Link to any relevant how-to guides here.
+Run lint and unit for one charm:
 
-Use this section to provide information on important actions, required configurations, or
-other operations the user should know about. You don’t need to list every action or configuration.
-Link the Charmhub documentation for actions and configurations if you write about them.
+```bash
+tox -e jenkins-k8s-lint
+tox -e jenkins-k8s-unit
+```
 
-You may also want to link to the `charmcraft.yaml` file here.
--->
+## Contributing
 
-## Integrations (optional)
-<!-- Information about particularly relevant interfaces, endpoints or libraries related to the
-charm. For example, peer relation endpoints required by other charms for integration.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Otherwise, include a link the Charmhub documentation on integrations.
---> 
+## Licensing
 
-## Learn more
-<!-- 
-Provide a list of resources, including the official documentation, developer documentation,
-an official website for the software and a troubleshooting guide. Note that this list is not
-exhaustive or always relevant for every charm. If there is no official troubleshooting guide,
-include a link to the relevant Matrix channel.
--->
-
-* [Read more](charm docs) <!--Link to the charm's official documentation-->
-* [Developer documentation](developer docs) <!--Link to any developer documentation (could be upstream)-->
-* [Official webpage](official site) <!--(Optional) Link to official upstream webpage/blog/marketing content--> 
-* [Troubleshooting](link to troubleshooting docs) <!--(Optional) Link to a page or section about troubleshooting/FAQ-->
-
-## Project and community
-* [Issues](github issues) <!--Link to GitHub issues (if applicable)-->
-* [Contributing](contribution guide) <!--Link to any contribution guides, preferably for the source code--> 
-* [Matrix](applicable link) <!--Link to contact info (if applicable), e.g. Matrix channel-->
-* [Launchpad](applicable link) <!--Link to Launchpad (if applicable)-->
-
-## Licensing and trademark (optional)
-
+See [LICENSE](LICENSE).
