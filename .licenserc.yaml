@@ -1,0 +1,55 @@
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+
+header:
+  - license:
+      spdx-id: Apache-2.0
+      copyright-owner: Canonical Ltd.
+      pattern: |
+        Copyright \d{4} Canonical Ltd.
+        See LICENSE file for licensing details.
+    paths:
+      - '**'
+    paths-ignore:
+      - '.github/**'
+      - '**/.gitkeep'
+      - '**/*.cfg'
+      - '**/*.conf'
+      - '**/*.ini'
+      - '**/*.j2'
+      - '**/*.json'
+      - '**/*.lock'
+      - '**/*.md'
+      - '**/*.rule'
+      - '**/*.tmpl'
+      - '**/*.toml'
+      - '**/*.txt'
+      - '**/*.xml'
+      - '**/*.yaml'
+      - '**/*.yml'
+      - '.codespellignore'
+      - '.dockerignore'
+      - '.flake8'
+      - '.jujuignore'
+      - '.gitignore'
+      - '.licenserc.yaml'
+      - '.trivyignore'
+      - '.woke.yaml'
+      - '.woke.yml'
+      - 'CODEOWNERS'
+      - 'Makefile'
+      - 'LICENSE'
+      - 'icon.svg'
+      - 'pyproject.toml'
+      - 'renovate.json'
+      - 'tox.ini'
+      - 'tox.toml'
+      - 'trivy.yaml'
+      - 'uv.lock'
+      - 'zap_rules.tsv'
+      - 'lib/**'
+      - 'charms/*/lib/**'
+      - 'charms/*/jenkins_rock/**'
+      - 'charms/*/grafana_dashboards/**'
+      - 'docs/**'
+    comment: on-failure

@@ -22,4 +22,4 @@ jobs:
       - name: Validate tox.ini
         run: python3 -m configparser tox.ini
       - name: Validate Renovate config
-        run: npx --yes renovate-config-validator
+        run: npx --yes renovate config-validator
