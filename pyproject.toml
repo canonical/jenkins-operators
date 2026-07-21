@@ -46,7 +46,6 @@ lint = [
   "pytest",
   "pytest-asyncio",
   "pytest-operator",
-  "pytest-playwright==0.7.2",
   "python-dotenv",
   "python-keycloak==7.1.1",
   "pydantic",
@@ -57,6 +56,9 @@ lint = [
   "toml",
   "types-pyyaml",
   "types-requests",
+]
+browser = [
+  "pytest-playwright==0.7.2",
 ]
 unit = [
   "coverage[toml]",
@@ -92,7 +94,6 @@ integration = [
   "pytest",
   "pytest-asyncio",
   "pytest-operator",
-  "pytest-playwright==0.7.2",
   "pytest-rerunfailures==15.1",
   "python-keycloak==7.1.1",
   "requests-toolbelt>=1.0.0",
