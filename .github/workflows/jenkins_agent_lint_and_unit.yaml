@@ -1,0 +1,62 @@
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+
+name: jenkins-agent lint and unit tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    paths:
+      - 'charms/jenkins-agent/**'
+      - '.github/workflows/jenkins_agent_*.yaml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      charm: ${{ steps.filter.outputs.charm }}
+      workflow: ${{ steps.filter.outputs.workflow }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            charm:
+              - 'charms/jenkins-agent/**'
+            workflow:
+              - '.github/workflows/jenkins_agent_*.yaml'
+
+  unit-tests-jenkins-agent:
+    name: unit-tests-jenkins-agent
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.charm == 'true' || needs.changes.outputs.workflow == 'true'
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: canonical/operator-workflows/.github/workflows/test.yaml@main
+    secrets: inherit
+    with:
+      working-directory: charms/jenkins-agent
+      with-uv: true
+
+  required-status-checks:
+    name: Required Test Status Checks - jenkins-agent
+    runs-on: ubuntu-latest
+    needs:
+      - unit-tests-jenkins-agent
+    if: always() && !cancelled()
+    timeout-minutes: 5
+    steps:
+      - run: |
+          [ '${{ needs.unit-tests-jenkins-agent.result }}' = 'success' ] || [ '${{ needs.unit-tests-jenkins-agent.result }}' = 'skipped' ] || (echo unit-tests failed && false)

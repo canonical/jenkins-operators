@@ -1,31 +1,59 @@
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+
 header:
-  license:
-    spdx-id: Apache-2.0
-    copyright-owner: Canonical Ltd.
-    content: |
-      Copyright [year] [owner]
-      See LICENSE file for licensing details.
-    pattern: |
-      Copyright \d{4} Canonical Ltd.
-      See LICENSE file for licensing details.
-  paths:
-  - '**'
-  paths-ignore:
-  - '.github/**'
-  - '**/*.json'
-  - '**/*.md'
-  - '**/*.rst'
-  - '**/*.txt'
-  - '.jujuignore'
-  - '.gitignore'
-  - '.licenserc.yaml'
-  - 'CODEOWNERS'
-  - 'LICENSE'
-  - 'trivy.yaml'
-  - 'pyproject.toml'
-  - 'zap_rules.tsv'
-  - '**/*.md.j2'
-  - '**/*.rst.j2'
-  - 'docs/release-notes/template/*.yaml'
-  - 'uv.lock'
-  comment: on-failure
+  - license:
+      spdx-id: Apache-2.0
+      copyright-owner: Canonical Ltd.
+      pattern: |
+        Copyright \d{4} Canonical Ltd.
+        See LICENSE file for licensing details.
+    paths:
+      - '**'
+    paths-ignore:
+      - '.github/**'
+      - '**/.gitkeep'
+      - '**/*.cfg'
+      - '**/*.conf'
+      - '**/*.ini'
+      - '**/*.j2'
+      - '**/*.json'
+      - '**/*.lock'
+      - '**/*.md'
+      - '**/*.rule'
+      - '**/*.tmpl'
+      - '**/*.toml'
+      - '**/*.txt'
+      - '**/*.xml'
+      - '**/*.yaml'
+      - '**/*.yml'
+      - '.codespellignore'
+      - '.dockerignore'
+      - '.flake8'
+      - '.jujuignore'
+      - '.gitignore'
+      - '.licenserc.yaml'
+      - '.trivyignore'
+      - '.woke.yaml'
+      - '.woke.yml'
+      - 'CODEOWNERS'
+      - 'Makefile'
+      - 'LICENSE'
+      - 'icon.svg'
+      - 'pyproject.toml'
+      - 'renovate.json'
+      - 'tox.ini'
+      - 'tox.toml'
+      - 'trivy.yaml'
+      - 'uv.lock'
+      - 'zap_rules.tsv'
+      - 'lib/**'
+      - 'charms/*/lib/**'
+      - 'charms/*/jenkins_rock/**'
+      - 'charms/*/grafana_dashboards/**'
+      - 'charms/jenkins-agent/templates/Jenkinsfile'
+      - 'charms/jenkins-agent/templates/jenkins_agent.service'
+      - 'charms/jenkins-k8s/tests/integration/files/dex.yaml'
+      - 'charms/jenkins-k8s/tests/integration/files/identity-bundle-edge-patched.yaml'
+      - 'docs/**'
+    comment: on-failure
