@@ -286,7 +286,7 @@ def test_parse_systemd_env():
     )
     result = service._parse_systemd_env(content)
     assert result == {
-        "JENKINS_TOKEN": "abc123",
+        "JENKINS_TOKEN": "abc123",  # nosec: B105
         "JENKINS_URL": "http://10.1.69.130:8080",
         "JENKINS_AGENT": "jenkins-agent-k8s-0",
     }
