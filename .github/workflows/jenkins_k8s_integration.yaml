@@ -52,6 +52,7 @@ jobs:
       identifier: jenkins-k8s
       working-directory: charms/jenkins-k8s
       test-tox-env: jenkins-k8s-integration
+      upload-image: artifact
       extra-arguments: |
         --kube-config=${GITHUB_WORKSPACE}/kube-config
       modules: '["test_auth_proxy.py", "test_cos.py", "test_ingress.py", "test_jenkins.py", "test_k8s_agent.py", "test_machine_agent.py", "test_plugins_part_1.py", "test_plugins_part_2.py", "test_proxy.py", "test_upgrade.py", "test_external_agent.py", "test_haproxy_route.py"]'
