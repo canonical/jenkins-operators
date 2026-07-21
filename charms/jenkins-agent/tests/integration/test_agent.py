@@ -192,7 +192,7 @@ def test_agent_traefik_ingress(
     ingressed_jenkins_server: str,
     jenkins_agent_application: str,
     jenkins_agent_requirer: str,
-    jenkins_client: jenkinsapi.jenkins.Jenkins,
+    ingressed_jenkins_client: jenkinsapi.jenkins.Jenkins,
     juju: jubilant.Juju,
 ):
     """
@@ -273,31 +273,31 @@ def test_agent_traefik_ingress(
 
     logger.info("WebSocket connection verified in agent logs")
 
-    # Verify agent is functional by checking it's registered in Jenkins
-    # Note: When using traefik ingress, the jenkins_client may not have access to all APIs
-    # The core verification (WebSocket connection + active status) is already confirmed above
+    # Verify agent is functional through the ingress URL
+    nodes = ingressed_jenkins_client.get_nodes()
+    assert all(node.is_online() for node in nodes.values()), "All agents should be online"
+
+    agent_nodes = [node for node in nodes.values() if jenkins_agent_application in node.name]
+    assert len(agent_nodes) == 1, f"Expected one agent node, found {len(agent_nodes)}"
+    agent_name = agent_nodes[0].name
+
+    logger.info("Agent %s is online, running test job...", agent_name)
+
+    # Wait and retry: the agent WebSocket may be established before the Jenkins API
+    # exposes the new node through the ingress (latency in traefik routing update).
     try:
-        nodes = jenkins_client.get_nodes()
-        assert all(node.is_online() for node in nodes.values()), "All agents should be online"
-
-        agent_nodes = [node for node in nodes.values() if jenkins_agent_application in node.name]
-        assert len(agent_nodes) == 1, f"Expected one agent node, found {len(agent_nodes)}"
-        agent_name = agent_nodes[0].name
-
-        logger.info("Agent %s is online, running test job...", agent_name)
-
-        # Run a test job to verify the agent can execute work
         assert_job_success(
-            client=jenkins_client,
+            client=ingressed_jenkins_client,
             agent_name=agent_name,
             test_target_label="machine",
         )
-        logger.info(
-            "✓ Traefik ingress test passed: agent connected via WebSocket and executed job"
+    except requests.exceptions.HTTPError:
+        logger.info("Initial Jenkins API call via ingress failed; retrying after short delay...")
+        time.sleep(15)
+        assert_job_success(
+            client=ingressed_jenkins_client,
+            agent_name=agent_name,
+            test_target_label="machine",
         )
-    except requests.exceptions.HTTPError as e:
-        # Jenkins API access may be limited through ingress - the core test (WebSocket connection) passed
-        logger.warning("Jenkins API access limited through ingress (expected): %s", e)
-        logger.info(
-            "✓ Traefik ingress test passed: agent connected via WebSocket (job execution skipped)"
-        )
+
+    logger.info("✓ Traefik ingress test passed: agent connected via WebSocket and executed job")

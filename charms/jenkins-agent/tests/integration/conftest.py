@@ -346,7 +346,6 @@ def traefik_k8s_application_fixture(use_docker: bool, microk8s_juju: jubilant.Ju
 
 @pytest.fixture(scope="module", name="ingressed_jenkins_server")
 def ingressed_jenkins_server_fixture(
-    jenkins_client: jenkinsapi.jenkins.Jenkins,
     traefik_k8s_application: str,
     microk8s_juju: jubilant.Juju,
 ):
@@ -371,3 +370,28 @@ def ingressed_jenkins_server_fixture(
     microk8s_juju.wait(jubilant.all_active, timeout=60 * 5)
     logger.info("Traefik ingress configured for jenkins-k8s")
     return JENKINS_APPLICATION_NAME
+
+
+@pytest.fixture(scope="module", name="ingressed_jenkins_client")
+def ingressed_jenkins_client_fixture(
+    ingressed_jenkins_server: str,
+    traefik_k8s_application: str,
+    microk8s_juju: jubilant.Juju,
+):
+    """Jenkins API client that talks through the traefik ingress.
+
+    The raw jenkins-k8s pod address is not reachable from the LXD controller on port 8080
+    once ingress is configured; API calls must go through traefik.
+    """
+    status = microk8s_juju.status()
+    traefik_status = status.get_units(traefik_k8s_application).get(f"{traefik_k8s_application}/0")
+    assert traefik_status, f"traefik-k8s unit not found in model {microk8s_juju.model}"
+    password = _get_juju_jenkins_server_password(
+        juju=microk8s_juju, application=JENKINS_APPLICATION_NAME
+    )
+    return jenkinsapi.jenkins.Jenkins(
+        baseurl=f"http://{traefik_status.address}:8080",
+        username="admin",
+        password=password,
+        timeout=120,
+    )
