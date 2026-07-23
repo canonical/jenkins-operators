@@ -2,9 +2,6 @@ name: jenkins-k8s Integration tests
 
 on:
   pull_request:
-    paths:
-      - 'charms/jenkins-k8s/**'
-      - '.github/workflows/jenkins_k8s_integration.yaml'
   schedule:
     - cron: "0 15 * * SAT"
 
@@ -17,7 +14,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.filter.outputs.charm }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            charm:
+              - 'charms/jenkins-k8s/**'
+              - '.github/workflows/jenkins_k8s_integration.yaml'
+
   integration-tests:
+    needs: detect-changes
+    if: ${{ github.event_name == 'schedule' || needs.detect-changes.outputs.changed == 'true' }}
     uses: canonical/operator-workflows/.github/workflows/integration_test.yaml@main
     secrets: inherit
     permissions:
@@ -39,8 +52,26 @@ jobs:
       microk8s-addons: "dns ingress rbac hostpath-storage registry"
       upload-image: artifact
       with-uv: true
+
   allure-report:
     if: ${{ !cancelled() && github.event_name == 'schedule' }}
     needs:
       - integration-tests
     uses: canonical/operator-workflows/.github/workflows/allure_report.yaml@main
+
+  required-status:
+    name: jenkins-k8s integration required status
+    runs-on: ubuntu-latest
+    needs:
+      - detect-changes
+      - integration-tests
+    if: always() && !cancelled()
+    timeout-minutes: 5
+    steps:
+      - name: Verify integration-tests result
+        run: |
+          R='${{ needs.integration-tests.result }}'
+          if [ "$R" = "success" ] || [ "$R" = "skipped" ]; then
+            echo "integration-tests: $R"; exit 0
+          fi
+          echo "integration-tests concluded: $R"; exit 1

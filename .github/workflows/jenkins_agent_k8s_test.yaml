@@ -2,12 +2,29 @@ name: jenkins-agent-k8s Tests
 
 on:
   pull_request:
-    paths:
-      - 'charms/jenkins-agent-k8s/**'
-      - '.github/workflows/jenkins_agent_k8s_test.yaml'
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.filter.outputs.charm }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            charm:
+              - 'charms/jenkins-agent-k8s/**'
+              - '.github/workflows/jenkins_agent_k8s_test.yaml'
+
   unit-tests:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.changed == 'true' }}
     permissions:
       contents: read
       pull-requests: write
@@ -16,3 +33,20 @@ jobs:
     with:
       working-directory: charms/jenkins-agent-k8s
       with-uv: true
+
+  required-status:
+    name: jenkins-agent-k8s test required status
+    runs-on: ubuntu-latest
+    needs:
+      - detect-changes
+      - unit-tests
+    if: always() && !cancelled()
+    timeout-minutes: 5
+    steps:
+      - name: Verify unit-tests result
+        run: |
+          R='${{ needs.unit-tests.result }}'
+          if [ "$R" = "success" ] || [ "$R" = "skipped" ]; then
+            echo "unit-tests: $R"; exit 0
+          fi
+          echo "unit-tests concluded: $R"; exit 1

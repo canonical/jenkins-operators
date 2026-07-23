@@ -2,14 +2,27 @@ name: jenkins-agent Integration tests
 
 on:
   pull_request:
-    paths:
-      - 'charms/jenkins-agent/**'
-      - '.github/workflows/jenkins_agent_integration.yaml'
   schedule:
     - cron: "0 15 * * SAT"
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.filter.outputs.charm }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            charm:
+              - 'charms/jenkins-agent/**'
+              - '.github/workflows/jenkins_agent_integration.yaml'
+
   integration-tests-amd64:
+    needs: detect-changes
+    if: ${{ github.event_name == 'schedule' || needs.detect-changes.outputs.changed == 'true' }}
     permissions:
       contents: read
       packages: write
@@ -22,7 +35,10 @@ jobs:
       channel: 1.34-strict/edge
       self-hosted-runner: true
       with-uv: true
+
   integration-tests-non-amd64:
+    needs: detect-changes
+    if: ${{ github.event_name == 'schedule' || needs.detect-changes.outputs.changed == 'true' }}
     strategy:
       matrix:
         runtime: [s390x, arm64, ppc64le]
@@ -41,6 +57,7 @@ jobs:
       self-hosted-runner-arch: ${{ matrix.runtime }}
       self-hosted-runner-label: ${{ matrix.runtime }}
       with-uv: true
+
   allure-report:
     if: ${{ !cancelled() && github.event_name == 'schedule' }}
     needs:
@@ -48,15 +65,27 @@ jobs:
       - integration-tests-non-amd64
     uses: canonical/operator-workflows/.github/workflows/allure_report.yaml@main
 
-  integration-tests:
-    name: Required Integration Test Status Checks
+  required-status:
+    name: jenkins-agent integration required status
     runs-on: ubuntu-latest
     needs:
+      - detect-changes
       - integration-tests-amd64
       - integration-tests-non-amd64
     if: always() && !cancelled()
     timeout-minutes: 5
     steps:
-      - run: |
-          [ '${{ needs.integration-tests-amd64.result }}' = 'success' ] || (echo integration-tests-amd64 failed && false)
-          [ '${{ needs.integration-tests-non-amd64.result }}' = 'success' ] || (echo integration-tests-non-amd64 failed && false)
+      - name: Verify integration-tests results
+        run: |
+          AMD='${{ needs.integration-tests-amd64.result }}'
+          NON='${{ needs.integration-tests-non-amd64.result }}'
+          fail=0
+          for pair in "amd64:$AMD" "non-amd64:$NON"; do
+            name="${pair%%:*}"; res="${pair##*:}"
+            if [ "$res" = "success" ] || [ "$res" = "skipped" ]; then
+              echo "integration-tests-$name: $res"
+            else
+              echo "integration-tests-$name concluded: $res"; fail=1
+            fi
+          done
+          exit $fail
