@@ -162,7 +162,7 @@ async def test_git_plugin_k8s_agent(unit_web_client: UnitWebClient):
         f"{unit_web_client.client.baseurl}/job/{job_name}/descriptorByName/"
         "hudson.plugins.git.UserRemoteConfig/checkUrl",
         data={
-            "value": "https://github.com/canonical/jenkins-k8s-operator",
+            "value": "https://github.com/canonical/jenkins-operators",
             "credentialsId": "",
         },
     )

@@ -354,9 +354,9 @@ async def test_jcasc_repository_config_from_file(
     await application.set_config(
         {
             "jcasc-config": "",
-            "jcasc-repository": "https://github.com/canonical/jenkins-k8s-operator.git",
+            "jcasc-repository": "https://github.com/canonical/jenkins-operators.git",
             "jcasc-repository-branch": branch,
-            "jcasc-repository-config-path": "tests/integration/data/jcasc",
+            "jcasc-repository-config-path": "charms/jenkins-k8s/tests/integration/data/jcasc",
         }
     )
 

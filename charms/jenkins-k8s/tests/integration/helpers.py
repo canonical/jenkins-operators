@@ -259,7 +259,7 @@ def gen_git_test_job_xml(node_label: str):
                 <configVersion>2</configVersion>
                 <userRemoteConfigs>
                     <hudson.plugins.git.UserRemoteConfig>
-                        <url>https://github.com/canonical/jenkins-k8s-operator</url>
+                        <url>https://github.com/canonical/jenkins-operators</url>
                     </hudson.plugins.git.UserRemoteConfig>
                 </userRemoteConfigs>
                 <branches>
