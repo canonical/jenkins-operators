@@ -1,0 +1,45 @@
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+
+name: jenkins-agent-k8s
+summary: Jenkins-agent-k8s rock
+description: Jenkins-agent-k8s OCI image for the Jenkins-agent-k8s charm
+version: "1.1"
+base: ubuntu@22.04
+build-base: ubuntu@22.04
+license: Apache-2.0
+platforms:
+  amd64:
+run-user: _daemon_
+parts:
+  jenkins:
+    plugin: nil
+    build-packages:
+      - sudo
+    overlay-packages:
+      - bash
+      - ca-certificates-java
+      - openjdk-21-jre-headless
+      - git
+      - sudo
+    override-prime: |
+      craftctl default
+      /bin/bash -c "mkdir -p --mode=775 var/{lib/jenkins,lib/jenkins/agents,log/jenkins}"
+  entrypoint:
+    plugin: dump
+    source: files
+    organize:
+      entrypoint.sh: /var/lib/jenkins/entrypoint.sh
+    override-prime: |
+      craftctl default
+      /bin/bash -c "chmod +x var/lib/jenkins/entrypoint.sh"
+  jenkins-agent-configure:
+    plugin: nil
+    after:
+      - "jenkins"
+      - "entrypoint"
+    override-prime: |
+      craftctl default
+      /bin/bash -c "chown -R 584792:584792 $CRAFT_PRIME/var/{lib/jenkins,log/jenkins}"
+      echo "_daemon_ ALL=NOPASSWD: ALL" >> $CRAFT_PRIME/etc/sudoers
+      visudo -c

@@ -1,25 +1,16 @@
-venv/
-build/
+*~
 *.charm
-.tox/
+.tox
 .coverage
-__pycache__/
-*.py[cod]
-.idea
+coverage.xml
+__pycache__
+build
+lib/ops
+lib/ops-*.dist-info
+^unit/
 .vscode
-.mypy_cache
-*.egg-info/
+venv
 *.rock
-**/*.rock
-.pytest_cache/
-.ruff_cache/
-**/terraform/tests/.terraform
-**/.terraform/
-**/.terraform.lock.hcl
-
-# AI agent artifacts (planning docs, checklists) — not part of the repo
-docs/superpowers/
-.hermes/
 
 # BEGIN VALE WORKFLOW IGNORE
 .vale/styles/*
@@ -33,3 +24,4 @@ docs/superpowers/
 !.vale/styles/config/vocabularies/local
 # END VALE WORKFLOW IGNORE
 
+.DS_Store

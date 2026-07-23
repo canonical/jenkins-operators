@@ -9,17 +9,12 @@ __pycache__/
 .vscode
 .mypy_cache
 *.egg-info/
-*.rock
-**/*.rock
-.pytest_cache/
-.ruff_cache/
-**/terraform/tests/.terraform
-**/.terraform/
-**/.terraform.lock.hcl
-
-# AI agent artifacts (planning docs, checklists) — not part of the repo
-docs/superpowers/
-.hermes/
+*/*.rock
+*/*.snap
+# charmcraft-related directories
+prime/
+parts/
+stage/
 
 # BEGIN VALE WORKFLOW IGNORE
 .vale/styles/*
@@ -32,4 +27,9 @@ docs/superpowers/
 .vale/styles/config/vocabularies/*
 !.vale/styles/config/vocabularies/local
 # END VALE WORKFLOW IGNORE
+.DS_Store
 
+# AI artifacts
+.hermes
+docs/plans/
+docs/superpowers/

@@ -1,0 +1,23 @@
+name: jenkins-agent Publish to edge
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'charms/jenkins-agent/**'
+      - '.github/workflows/jenkins_agent_publish.yaml'
+
+jobs:
+  publish-to-edge:
+    uses: canonical/operator-workflows/.github/workflows/publish_charm.yaml@main
+    permissions:
+      actions: read
+      contents: write
+    secrets: inherit
+    with:
+      working-directory: charms/jenkins-agent
+      tag-prefix: jenkins-agent
+      integration-test-workflow-file: jenkins_agent_integration.yaml
+      channel: latest/edge

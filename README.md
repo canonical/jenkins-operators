@@ -1,77 +1,52 @@
-<!--
-Avoid using this README file for information that is maintained or published elsewhere, e.g.:
+# Jenkins operators
 
-* metadata.yaml > published on Charmhub
-* documentation > published on (or linked to from) Charmhub
-* detailed contribution guide > documentation or CONTRIBUTING.md
+This is a monorepo containing the source for the Jenkins family of
+[Juju](https://juju.is/) charms maintained by Canonical.
 
-Use links instead.
--->
-# Platform engineering charm template
-<!-- Use this space for badges -->
+## Charms
 
-Describe your charm in 1-2 sentences. Include the software that the charm deploys (if applicable), and the substrate (VM/K8s).
+| Charm | Directory | Charmhub | Description |
+|-------|-----------|----------|-------------|
+| `jenkins-k8s` | [`charms/jenkins-k8s`](charms/jenkins-k8s) | [charmhub.io/jenkins-k8s](https://charmhub.io/jenkins-k8s) | Deploys and manages a Jenkins server on Kubernetes. |
+| `jenkins-agent-k8s` | [`charms/jenkins-agent-k8s`](charms/jenkins-agent-k8s) | [charmhub.io/jenkins-agent-k8s](https://charmhub.io/jenkins-agent-k8s) | Deploys and manages Jenkins agents on Kubernetes. |
+| `jenkins-agent` | [`charms/jenkins-agent`](charms/jenkins-agent) | [charmhub.io/jenkins-agent](https://charmhub.io/jenkins-agent) | Deploys and manages Jenkins agents on machines (VMs / bare metal). |
 
-Like any Juju charm, this charm supports one-line deployment, configuration, integration, scaling, and more. For Charmed {Name}, this includes:
-* list or summary of app-specific features
+## Repository layout
 
-For information about how to deploy, integrate, and manage this charm, see the Official [platform-engineering-charm-template Documentation](external link).
+```
+jenkins-operators/
+├── charms/
+│   ├── jenkins-k8s/          # Jenkins server (Kubernetes)
+│   ├── jenkins-agent-k8s/    # Jenkins agent (Kubernetes)
+│   └── jenkins-agent/        # Jenkins agent (machine)
+└── .github/workflows/        # Per-charm CI (path-filtered) + repo-wide lint
+```
 
-## Get started
-<!--If the charm already contains a relevant how-to guide or tutorial in its documentation,
-use this section to link the documentation. You don’t need to duplicate documentation here.
-If the tutorial is more complex than getting started, then provide brief descriptions of the
-steps needed for the simplest possible deployment. Make sure to include software and hardware
-prerequisites.
+Each charm directory is self-contained: it keeps its own `charmcraft.yaml`,
+`pyproject.toml`, `tox.toml`, `uv.lock`, source, tests and docs.
 
-This section could be structured in the following way:
+## Developing
 
-### Set up
-<Steps for setting up the environment (e.g. via Multipass)>
+Work on a single charm from within its directory. Each charm defines the
+standard tox environments:
 
-### Deploy
-<Steps for deploying the charm>
+```bash
+cd charms/jenkins-k8s
+tox -e lint      # style + codespell + ruff + mypy
+tox -e unit      # unit tests + coverage
+tox -e static    # bandit static analysis
+```
 
--->
+## CI
 
-### Basic operations
-<!--Brief walkthrough of performing standard configurations or operations.
+CI is organised per charm. Each charm has path-filtered `*_test.yaml` and
+`*_integration.yaml` workflows that invoke the shared
+[`canonical/operator-workflows`](https://github.com/canonical/operator-workflows)
+reusable workflows with `working-directory: charms/<charm>`, so a pull request
+only runs the jobs for the charm(s) it touches. A `repo_lint.yaml` workflow
+checks Apache-2.0 license headers across the whole repository.
 
-Use this section is to emphasize features or capabilities of the charm.
-Link to any relevant how-to guides here.
+## Contributing
 
-Use this section to provide information on important actions, required configurations, or
-other operations the user should know about. You don’t need to list every action or configuration.
-Link the Charmhub documentation for actions and configurations if you write about them.
-
-You may also want to link to the `charmcraft.yaml` file here.
--->
-
-## Integrations (optional)
-<!-- Information about particularly relevant interfaces, endpoints or libraries related to the
-charm. For example, peer relation endpoints required by other charms for integration.
-
-Otherwise, include a link the Charmhub documentation on integrations.
---> 
-
-## Learn more
-<!-- 
-Provide a list of resources, including the official documentation, developer documentation,
-an official website for the software and a troubleshooting guide. Note that this list is not
-exhaustive or always relevant for every charm. If there is no official troubleshooting guide,
-include a link to the relevant Matrix channel.
--->
-
-* [Read more](charm docs) <!--Link to the charm's official documentation-->
-* [Developer documentation](developer docs) <!--Link to any developer documentation (could be upstream)-->
-* [Official webpage](official site) <!--(Optional) Link to official upstream webpage/blog/marketing content--> 
-* [Troubleshooting](link to troubleshooting docs) <!--(Optional) Link to a page or section about troubleshooting/FAQ-->
-
-## Project and community
-* [Issues](github issues) <!--Link to GitHub issues (if applicable)-->
-* [Contributing](contribution guide) <!--Link to any contribution guides, preferably for the source code--> 
-* [Matrix](applicable link) <!--Link to contact info (if applicable), e.g. Matrix channel-->
-* [Launchpad](applicable link) <!--Link to Launchpad (if applicable)-->
-
-## Licensing and trademark (optional)
-
+See the `CONTRIBUTING.md` file inside each charm directory. This project is
+released under the [Apache 2.0 license](LICENSE).

@@ -1,0 +1,75 @@
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+
+name: jenkins
+summary: Jenkins rock
+description: Jenkins OCI image for the Jenkins charm
+version: "1.0"
+base: ubuntu@24.04
+build-base: ubuntu@24.04
+license: Apache-2.0
+platforms:
+  amd64:
+services:
+  jenkins:
+    override: replace
+    summary: jenkins
+    startup: enabled
+    command: java -Djava.awt.headless=true -Djava.util.logging.config.file=/var/lib/jenkins/logging.properties -jar /srv/jenkins/jenkins.war
+    environment:
+      JENKINS_HOME: /var/lib/jenkins
+    user: jenkins
+    group: jenkins
+
+parts:
+  add-user:
+    plugin: nil
+    overlay-script: |
+      mkdir -p $CRAFT_OVERLAY/var
+      chmod 755 $CRAFT_OVERLAY/var
+      groupadd -R $CRAFT_OVERLAY --gid 2000 jenkins
+      useradd -R $CRAFT_OVERLAY --system --gid 2000 --uid 2000 --home /var/lib/jenkins jenkins
+  jenkins:
+    plugin: nil
+    build-packages:
+      - ca-certificates-java
+      - curl
+      - libnss3
+      - unzip
+      - openjdk-21-jdk-headless
+    # Referred from https://github.com/jenkinsci/docker/blob/master/debian/bookworm/hotspot/Dockerfile
+    overlay-packages:
+      - bash
+      - ca-certificates
+      - ca-certificates-java
+      - curl
+      - fonts-dejavu-core
+      - git
+      - gnupg
+      - gpg
+      - libfontconfig1
+      - libfreetype6
+      - libharfbuzz0b
+      - openjdk-21-jre-headless
+      - procps
+      - ssh-client
+      - tini
+      - tzdata
+      - wget
+      - unzip
+    build-environment:
+      # Modifying the following format will break renovate configuration for auto-patching Jenkins.
+      # See renovate.json "customManagers" section.
+      - JENKINS_VERSION: 2.555.1
+      - JENKINS_PLUGIN_MANAGER_VERSION: 2.13.2
+    override-build: |
+      mkdir -p ${CRAFT_PART_INSTALL}/{srv/jenkins/,etc/default/jenkins/}
+      # Use jenkins war rather than apt install for easier Jenkins version control.
+      cd ${CRAFT_PART_INSTALL}/srv/jenkins
+      curl -m 1200 -sLO https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/${JENKINS_PLUGIN_MANAGER_VERSION}/jenkins-plugin-manager-${JENKINS_PLUGIN_MANAGER_VERSION}.jar
+      curl -m 1200 -sLO https://updates.jenkins.io/download/war/${JENKINS_VERSION}/jenkins.war
+      jarsigner -verify -verbose jenkins.war
+    override-prime: |
+      craftctl default  
+      /bin/bash -c "mkdir -p --mode=775 {srv/jenkins/,etc/default/jenkins/,var/lib/jenkins}"
+      /bin/bash -c "chown -R 2000:2000 {srv/jenkins,etc/default/jenkins/,var/lib/jenkins}"
