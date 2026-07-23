@@ -9,23 +9,42 @@ header:
       Copyright \d{4} Canonical Ltd.
       See LICENSE file for licensing details.
   paths:
-  - '**'
+    - "charms/**"
   paths-ignore:
-  - '.github/**'
-  - '**/*.json'
-  - '**/*.md'
-  - '**/*.rst'
-  - '**/*.txt'
-  - '.jujuignore'
-  - '.gitignore'
-  - '.licenserc.yaml'
-  - 'CODEOWNERS'
-  - 'LICENSE'
-  - 'trivy.yaml'
-  - 'pyproject.toml'
-  - 'zap_rules.tsv'
-  - '**/*.md.j2'
-  - '**/*.rst.j2'
-  - 'docs/release-notes/template/*.yaml'
-  - 'uv.lock'
+    - "**/.gitkeep"
+    - "**/*.cfg"
+    - "**/*.conf"
+    - "**/*.j2"
+    - "**/*.json"
+    - "**/*.md"
+    - "**/*.rst"
+    - "**/*.rule"
+    - "**/*.svg"
+    - "**/*.tmpl"
+    - "**/*.tsv"
+    - "**/*.txt"
+    - "**/*.xml"
+    - "**/*.md.j2"
+    - "**/*.rst.j2"
+    - "**/.codespellignore"
+    - "**/.dockerignore"
+    - "**/.flake8"
+    - "**/.jujuignore"
+    - "**/.gitignore"
+    - "**/.licenserc.yaml"
+    - "**/.trivyignore"
+    - "**/.woke.yaml"
+    - "**/.woke.yml"
+    - "**/CODEOWNERS"
+    - "**/icon.svg"
+    - "**/LICENSE"
+    - "**/trivy.yaml"
+    - "**/zap_rules.tsv"
+    - "**/pyproject.toml"
+    - "**/uv.lock"
+    - "charms/*/lib/**"
+    - "charms/*/*_rock/**"
+    - "charms/jenkins-k8s/tests/integration/files/dex.yaml"
+    - "charms/jenkins-k8s/tests/integration/files/identity-bundle-edge-patched.yaml"
+    - "docs/**"
   comment: on-failure

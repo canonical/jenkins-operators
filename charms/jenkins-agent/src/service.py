@@ -1,0 +1,313 @@
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+
+"""The agent pebble service module."""
+
+import logging
+import os
+import pwd
+import re
+import time
+import typing
+from pathlib import Path
+
+import jinja2
+from charms.operator_libs_linux.v0 import apt
+from charms.operator_libs_linux.v1 import systemd
+
+from charm_state import Credentials, State
+
+logger = logging.getLogger(__name__)
+AGENT_SERVICE_NAME = "jenkins-agent"
+REQUIRED_PACKAGES = ["openjdk-21-jre"]
+SYSTEMD_SERVICE_CONF_DIR = "/etc/systemd/system/jenkins-agent.service.d/"
+STARTUP_CHECK_TIMEOUT = 30
+STARTUP_CHECK_INTERVAL = 2
+JENKINS_HOME = Path("/var/lib/jenkins")
+JENKINS_AGENT_SYSTEMD_PATH = Path("/etc/systemd/system/jenkins-agent.service")
+JENKINS_AGENT_START_SCRIPT_PATH = Path("/usr/bin/jenkins-agent")
+AGENT_READY_PATH = Path(JENKINS_HOME / ".ready")
+
+# Pattern for systemd Environment="KEY=VALUE" lines.
+_SYSTEMD_ENV_PATTERN = re.compile(r'^Environment="([^=]+)=(.*)"$')
+
+
+def _parse_systemd_env(content: str) -> typing.Dict[str, str]:
+    """Parse Environment directives from a systemd override.conf file.
+
+    Args:
+        content: The file content to parse.
+
+    Returns:
+        A dictionary of environment variable key-value pairs.
+    """
+    env: typing.Dict[str, str] = {}
+    for line in content.splitlines():
+        match = _SYSTEMD_ENV_PATTERN.match(line.strip())
+        if match:
+            env[match.group(1)] = match.group(2)
+    return env
+
+
+class PackageInstallError(Exception):
+    """Exception raised when package installation fails."""
+
+
+class ServiceRestartError(Exception):
+    """Exception raised when failing to start the agent service."""
+
+
+class ServiceStopError(Exception):
+    """Exception raised when failing to stop the agent service."""
+
+
+class FileRenderError(Exception):
+    """Exception raised when failing to interact with a file in the filesystem."""
+
+
+class JenkinsAgentService:
+    """Jenkins agent service class.
+
+    Attrs:
+       is_active: Indicate if the agent service is active and running.
+    """
+
+    def __init__(self, state: State):
+        """Initialize the jenkins agent service.
+
+        Args:
+            state: The Jenkins agent state.
+        """
+        self.state = state
+        # The templates render systemd/shell configuration, not HTML/XML. HTML
+        # autoescaping would corrupt credential values containing characters such
+        # as & < > ' " (e.g. turning a token's '&' into '&amp;'), so escaping is
+        # disabled for every template extension.
+        self._template_loader = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(searchpath="templates"),
+            autoescape=jinja2.select_autoescape(
+                enabled_extensions=(), default_for_string=False, default=False
+            ),
+        )
+
+    def _render_file(self, path: Path, content: str, mode: int) -> None:
+        """Write a content rendered from a template to a file.
+
+        Args:
+            path: Path object to the file.
+            content: the data to be written to the file.
+            mode: access permission mask applied to the
+              file using chmod (e.g. 0o640).
+
+        Raises:
+            FileRenderError: if interaction with the filesystem fails
+        """
+        try:
+            path.write_text(content)
+            os.chmod(path, mode)
+            # Get the uid/gid for the root user (running the service).
+            # TODO: the user running the jenkins agent is currently root
+            # we should replace this by defining a dedicated user in the apt package
+            u = pwd.getpwnam("root")
+            # Set the correct ownership for the file.
+            os.chown(path, uid=u.pw_uid, gid=u.pw_gid)
+        except (OSError, KeyError, TypeError) as exc:
+            raise FileRenderError(f"Error rendering file:\n{exc}") from exc
+
+    @property
+    def is_active(self) -> bool:
+        """Indicate if the jenkins agent service is active."""
+        try:
+            return AGENT_READY_PATH.exists() and systemd.service_running(AGENT_SERVICE_NAME)
+        except SystemError as exc:
+            logger.error("Failed to call systemctl:\n%s", exc)
+            return False
+
+    def credentials_changed(self, credentials: Credentials) -> bool:
+        """Check whether the current service credentials differ from the given ones.
+
+        Args:
+            credentials: The credentials to compare against the running configuration.
+
+        Returns:
+            True if the credentials have changed, False otherwise.
+        """
+        config_file = Path(f"{SYSTEMD_SERVICE_CONF_DIR}/override.conf")
+        if not config_file.exists():
+            return True
+        current_env = _parse_systemd_env(config_file.read_text())
+        return (
+            current_env.get("JENKINS_URL") != credentials.address
+            or current_env.get("JENKINS_TOKEN") != credentials.secret
+        )
+
+    def _write_if_changed(self, path: Path, content: str, mode: int) -> bool:
+        """Render content to a file only when it differs from what is on disk.
+
+        Args:
+            path: Destination file path.
+            content: Desired file content.
+            mode: Access permission mask applied when the file is (re)written.
+
+        Returns:
+            True if the file was created or its content changed, False otherwise.
+
+        Raises:
+            FileRenderError: if reading the existing file from disk fails.
+        """
+        try:
+            if path.exists() and path.read_text(encoding="utf-8") == content:
+                return False
+        except OSError as exc:
+            raise FileRenderError(f"Error reading file:\n{exc}") from exc
+        self._render_file(path, content, mode)
+        return True
+
+    def _sync_service_files(self) -> bool:
+        """Write the systemd unit and its launcher script if they've changed.
+
+        The systemd unit and the shell script run by ExecStart are shipped as
+        non-templated files in templates/. We read them here and write them only if
+        their contents differ, so an upgrade that changes a template is always
+        picked up while an unchanged reconcile is a no-op.
+
+        Returns:
+            True if the systemd unit file changed (a daemon reload is required),
+            False otherwise.
+        """
+        service_content = Path("templates/jenkins_agent.service").read_text(encoding="utf-8")
+        unit_changed = self._write_if_changed(JENKINS_AGENT_SYSTEMD_PATH, service_content, 0o644)
+
+        # Render the agent script template with websocket_mode config
+        websocket_mode = self.state.websocket_mode
+        script_template = self._template_loader.get_template("jenkins_agent.sh.j2")
+        script_content = script_template.render(websocket_mode=websocket_mode)
+        script_changed = self._write_if_changed(
+            JENKINS_AGENT_START_SCRIPT_PATH, script_content, 0o755
+        )
+        return unit_changed or script_changed
+
+    def _required_packages_installed(self) -> bool:
+        """Check whether every required apt package is already installed.
+
+        Returns:
+            True if all required packages are present, False otherwise.
+        """
+        for package in REQUIRED_PACKAGES:
+            try:
+                apt.DebianPackage.from_installed_package(package)
+            except apt.PackageNotFoundError:
+                return False
+        return True
+
+    def install(self) -> None:
+        """Converge the agent service files and required packages to desired state.
+
+        Idempotent and safe to run on every reconcile: the systemd unit and launch
+        script are re-rendered whenever their contents drift from the shipped
+        templates (reloading and enabling the unit when the unit file changes), and
+        the required apt packages are installed only when missing.
+
+        Raises:
+            PackageInstallError: if enabling the service or installing a package
+                failed.
+        """
+        unit_file_changed = self._sync_service_files()
+        if unit_file_changed:
+            try:
+                systemd.daemon_reload()
+                # Enable the unit so its [Install] WantedBy target is wired up and
+                # the agent starts automatically after a machine reboot.
+                systemd.service_enable(AGENT_SERVICE_NAME)
+            except systemd.SystemdError as exc:
+                raise PackageInstallError("Error enabling the agent service") from exc
+
+        if self._required_packages_installed():
+            return
+        try:
+            apt.add_package(REQUIRED_PACKAGES, update_cache=True)
+        except (apt.PackageError, apt.PackageNotFoundError) as exc:
+            raise PackageInstallError("Error installing the Java package") from exc
+
+    def restart(self) -> None:
+        """Start the agent service.
+
+        Raises:
+            ServiceRestartError: when restarting the service fails
+        """
+        # Render template and write to appropriate file if only credentials are set
+        credentials = self.state.agent_relation_credentials
+        if not credentials:
+            raise ServiceRestartError("Error starting the agent service: missing configuration")
+
+        # fetch credentials and set them as environments
+        environments = {
+            "JENKINS_TOKEN": credentials.secret,
+            "JENKINS_URL": credentials.address,
+            "JENKINS_AGENT": self.state.agent_meta.name,
+        }
+        # render template file
+        agent_env_conf_template = self._template_loader.get_template("jenkins_agent_env.conf.j2")
+        rendered = agent_env_conf_template.render(environments=environments)
+        # Ensure that service conf directory exist
+        config_dir = Path(SYSTEMD_SERVICE_CONF_DIR)
+        config_dir.mkdir(parents=True, exist_ok=True)
+        # Write the conf file
+        logger.info("Rendering agent configuration")
+        logger.debug("%s", environments)
+        config_file = Path(f"{SYSTEMD_SERVICE_CONF_DIR}/override.conf")
+        try:
+            self._render_file(config_file, rendered, 0o644)
+            systemd.daemon_reload()
+            systemd.service_restart(AGENT_SERVICE_NAME)
+        except systemd.SystemdError as exc:
+            raise ServiceRestartError(f"Error starting the agent service:\n{exc}") from exc
+        except FileRenderError as exc:
+            raise ServiceRestartError(
+                "Error interacting with the filesystem when rendering configuration file"
+            ) from exc
+
+        # Check if the service is running after startup
+        if not self._startup_check():
+            raise ServiceRestartError("Error waiting for the agent service to start")
+
+    def reset_failed_state(self) -> None:
+        """Reset NRestart count of service back to 0.
+
+        The service keeps track of the 'restart-count' and blocks further restarts
+        if the maximum allowed is reached. This count is not reset when the service restarts
+        so we need to do it manually.
+        """
+        try:
+            # Disable protected-access here because reset-failed is not implemented in the lib
+            systemd._systemctl("reset-failed", AGENT_SERVICE_NAME)  # pylint: disable=W0212
+        except systemd.SystemdError:
+            # We only log the exception here as this is not critical
+            logger.error("Failed to reset failed state")
+
+    def reset(self) -> None:
+        """Stop the agent service and clear its configuration file.
+
+        Raises:
+            ServiceStopError: if systemctl stop returns a non-zero exit code.
+        """
+        try:
+            systemd.service_stop(AGENT_SERVICE_NAME)
+        except systemd.SystemdError as exc:
+            logger.error("service %s failed to stop", AGENT_SERVICE_NAME)
+            raise ServiceStopError(f"service {AGENT_SERVICE_NAME} failed to stop") from exc
+        config_file = Path(f"{SYSTEMD_SERVICE_CONF_DIR}/override.conf")
+        config_file.unlink(missing_ok=True)
+
+    def _startup_check(self) -> bool:
+        """Check whether the service was correctly started.
+
+        Returns:
+            bool: indicate whether the service was started.
+        """
+        timeout = time.time() + STARTUP_CHECK_TIMEOUT
+        while time.time() < timeout:
+            time.sleep(STARTUP_CHECK_INTERVAL)
+            if self.is_active:
+                break
+        return self.is_active
