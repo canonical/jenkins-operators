@@ -46,5 +46,7 @@ header:
     - "charms/*/*_rock/**"
     - "charms/jenkins-k8s/tests/integration/files/dex.yaml"
     - "charms/jenkins-k8s/tests/integration/files/identity-bundle-edge-patched.yaml"
+    - "charms/jenkins-agent/templates/Jenkinsfile"
+    - "charms/jenkins-agent/templates/jenkins_agent.service"
     - "docs/**"
   comment: on-failure
